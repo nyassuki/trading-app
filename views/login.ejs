@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Trading App</title>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="card shadow-sm rounded-3">
+          <div class="card-body">
+            <h4 class="card-title text-center mb-4">Login</h4>
+
+            <% if (messages && messages.error) { %>
+              <div class="alert alert-danger">
+                <%= messages.error[0] %>
+              </div>
+            <% } %>
+
+            <% if (messages && messages.success) { %>
+              <div class="alert alert-success">
+                <%= messages.success[0] %>
+              </div>
+            <% } %>
+
+            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+              <div class="alert alert-danger">
+                <ul class="mb-0">
+                  <% errors.forEach(error => { %>
+                    <li><%= error.msg %></li>
+                  <% }) %>
+                </ul>
+              </div>
+            <% } %>
+
+            <form id="loginForm" method="POST">
+              <input type="hidden" name="_csrf" id="csrfToken" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input 
+                  type="email" 
+                  name="email" 
+                  class="form-control" 
+                  id="email" 
+                  placeholder="Enter your email" 
+                  required 
+                  autocomplete="email" 
+                  value="<%= typeof input !== 'undefined' && input.email ? input.email : '' %>" />
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                  type="password" 
+                  name="password" 
+                  class="form-control" 
+                  id="password" 
+                  placeholder="Enter your password" 
+                  required 
+                  autocomplete="current-password" />
+              </div>
+
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe"
+                  <%= typeof input !== 'undefined' && input.rememberMe ? 'checked' : '' %>>
+                <label class="form-check-label" for="rememberMe">Remember me</label>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+
+            <div class="text-center mt-3">
+              <a href="/auth/google" class="btn btn-outline-danger w-100">
+                <img src="https://developers.google.com/identity/images/g-logo.png" style="width:18px; margin-right:6px;" />
+                Login with Google
+              </a>
+            </div>
+
+            <div class="text-center mt-3">
+              <a href="/register">Don't have an account? Register</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AJAX Script -->
+  <script>
+  $('#loginForm').on('submit', function(e) {
+    e.preventDefault();  // Prevent default form submission
+
+    // Serialize the form data (including CSRF token)
+     var formData = {
+        email: $('#email').val(),
+        password: $('#password').val(),
+        csrfToken: getCookie('XSRF-TOKEN')  // Example for CSRF token
+    };
+    // Send the form data using AJAX
+    $.ajax({
+        url: '/login',  // The URL to send the form data to
+        type: 'POST',   // HTTP method
+        data: JSON.stringify(formData), // The form data (serialized)
+        contentType: 'application/json',
+        headers: {
+          'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') // CSRF token header
+        },
+        success: function(response) {
+          console.log(response.redirectUrl);
+          if (response.redirect) {
+              $(location).attr('href', response.redirectUrl); // Redirect if the server sends a redirect URL
+          } else {
+              // Handle the response (e.g., show errors or a success message)
+             // alert('Login successful!');
+          }
+        },
+        error: function(err) {
+            // Handle any errors that occur during the request
+            alert('An error occurred. Please try again.');
+            console.error('AJAX error:', err.responseText);
+        }
+    });
+  });
+function getCookie(name) {
+    var value = `; ${document.cookie}`;
+    var parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;  // Return null if cookie is not found
+}
+
+  </script>
+</body>
+</html>
+
+
