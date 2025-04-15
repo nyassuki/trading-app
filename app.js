@@ -19,9 +19,10 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const walletRoutes = require('./routes/walletRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 
-//const createWebSocketServer = require('./helper/backend/src/services/wsServer');
-//createWebSocketServer.createWebSocketServer(8080);
-
+if(process.env.LOCAL_WSS==1) {
+  const createWebSocketServer = require('./helper/backend/src/services/wsServer');
+  createWebSocketServer.createWebSocketServer(8080);
+}
 // Initialize session store
 const sessionStore = new MySQLStore({}, db);
 
