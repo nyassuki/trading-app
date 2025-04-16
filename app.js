@@ -164,6 +164,6 @@ app.use((req, res, next) => {
 });
 
 // Server start
-app.listen(process.env.SERVER_PORT, '127.0.0.1', () => {
+app.listen(process.env.SERVER_PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on http://127.0.0.1:${process.env.SERVER_PORT}`);
 });
